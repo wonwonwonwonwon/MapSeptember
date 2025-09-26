@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         row.innerHTML = `
             <div class="record-type ${record.Type}">${typeText[record.Type] || record.Type}</div>
             <div class="record-content" title="${record.Content}">${record.Content}</div>
-            <div class="record-title" title="${record.Reaction}">${record.Reaction || '-'}</div>
+            <div class="record-title" title="${record.title}">${record.title || '-'}</div>
             <div class="record-date">${new Date(record.Date).toLocaleDateString()}</div>
             <div class="record-mood">${moodEmojis[record.Mood] || ''}</div>
         `;
