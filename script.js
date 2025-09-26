@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             date: formData.get('date'),
             content: formData.get('content'),
             mood: formData.get('mood'),
-            reaction: formData.get('reaction')
+            title: formData.get('https://script.google.com/macros/s/AKfycbzjscbyQFNYxSsWrSk_jLm37y04s8iYmCLCcJVrQVvOUqOpYAmF7Yzv2dM5PzKT-RTP/exec')
         };
 
         try {
