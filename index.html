@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 선행 기록</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>나의 행복한 하루</h1>
+            <p>오늘 하루 느꼈던 작은 행복을 기록해보세요.</p>
+        </header>
+        <main>
+            <form id="record-form">
+                <div class="form-group">
+                    <label for="type">오늘 행복이 있으셨나요?</label>
+                    <select id="type" name="type">
+                        <option value="deed">행복했어요!</option>
+                        <option value="help">조금 아쉬웠어요..!</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">날짜</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" name="title" placeholder=" ">
+                </div>
+                <div class="form-group">
+                    <label for="content">내용</label>
+                    <textarea id="content" name="content" rows="4" placeholder="행복했던 일이 있다면 적어주세요." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>행복을 느꼈던 크기</label>
+                    <div class="mood-selector">
+                        <input type="radio" id="mood-happy" name="mood" value="행복" checked>
+                        <label for="mood-happy">굉장함</label>
+                        <input type="radio" id="mood-proud" name="mood" value="보통">
+                        <label for="mood-proud">적당함</label>
+                        <input type="radio" id="mood-thankful" name="mood" value="우울">
+                        <label for="mood-thankful">잔잔함</label>
+                        <input type="radio" id="mood-moved" name="mood" value="분노">
+                        <label for="mood-moved">소소함</label>
+                    </div>
+                </div>
+                <button type="submit">기록하기</button>
+            </form>
+
+            <section class="stats-section">
+                <h3>이번 달 통계</h3>
+                <div class="chart-container">
+                    <canvas id="mood-chart"></canvas>
+                </div>
+            </section>
+
+            <section class="records-section">
+                <div class="section-header">
+                    <h2>우리의 기록들</h2>
+                    <button id="export-excel">엑셀로 내보내기</button>
+                </div>
+                <div class="records-list-container">
+                    <div class="records-header">
+                        <div>유무</div>
+                        <div>제목</div>
+                        <div>내용</div>     
+                        <div>날짜</div>
+                        <div>크기</div>
+                    </div>
+                    <div id="records-container">
+                        <!-- 기록 목록이 여기에 동적으로 추가됩니다. -->
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2025 나의 따뜻한 하루. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
