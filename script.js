@@ -1,171 +1,146 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // !!! 중요: README.md 파일을 읽고, 배포된 자신의 Google Apps Script 웹 앱 URL로 변경하세요.
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzjscbyQFNYxSsWrSk_jLm37y04s8iYmCLCcJVrQVvOUqOpYAmF7Yzv2dM5PzKT-RTP/exec';
+const allData = [
+    { id: 1, map: 'dongne', price: 1500, rating: 1.2, x: 28, y: 20, popupImage: 'images/popups/item_1.png' },
+    { id: 2, map: 'dongne', price: 21000, rating: 1.8, x: 27, y: 16, popupImage: 'images/popups/item_2.png' },
+    { id: 3, map: 'dongne', price: 5000, rating: 4.2, x: 40, y: 56, popupImage: 'images/popups/item_3.png' },
+    { id: 4, map: 'dongne', price: 18000, rating: 3.3, x: 23, y: 58, popupImage: 'images/popups/item_4.png' },
+    { id: 5, map: 'dongne', price: 11000, rating: 2.5, x: 26, y: 62, popupImage: 'images/popups/item_5.png' },
+    { id: 6, map: 'dongne', price: 3100, rating: 3.2, x: 35, y: 35, popupImage: 'images/popups/item_6.png' },
+    { id: 7, map: 'dongne', price: 8000, rating: 4.8, x: 37, y: 53, popupImage: 'images/popups/item_7.png' },
+    { id: 8, map: 'dongne', price: 32500, rating: 4.5, x: 42, y: 47, popupImage: 'images/popups/item_8.png' },
+    { id: 9, map: 'dongne', price: 33000, rating: 2.8, x: 37, y: 32, popupImage: 'images/popups/item_9.png' },
+    { id: 10, map: 'dongne', price: 14500, rating: 3.8, x: 29, y: 68, popupImage: 'images/popups/item_10.png' },
+    { id: 11, map: 'dongne', price: 7200, rating: 1.4, x: 36, y: 38, popupImage: 'images/popups/item_11.png' },
+    { id: 12, map: 'dongne', price: 17500, rating: 2.2, x: 48, y: 51, popupImage: 'images/popups/item_12.png' },
+    // ... (모든 항목의 y 값을 위 공식으로 재계산) ...
 
-    const recordForm = document.getElementById('record-form');
-    const recordsContainer = document.getElementById('records-container');
-    const dateInput = document.getElementById('date');
-    const exportButton = document.getElementById('export-excel');
-    const moodChartCanvas = document.getElementById('mood-chart');
-    let recordsCache = []; // 데이터 캐싱
-    let moodChart;
+    { id: 13, map: 'hakgyo', price: 14000, rating: 2.9, x: 37, y: 72, popupImage: 'images/popups/item_13.png' },
+    { id: 14, map: 'hakgyo', price: 6800, rating: 1.2, x: 42, y: 30, popupImage: 'images/popups/item_14.png' },
+    { id: 15, map: 'hakgyo', price: 2600, rating: 3.6, x: 46, y: 76, popupImage: 'images/popups/item_15.png' }, // (지도상 ₩2,800 위치 참고)
+    { id: 16, map: 'hakgyo', price: 6500, rating: 1.9, x: 43, y: 79, popupImage: 'images/popups/item_16.png' },
+    { id: 17, map: 'hakgyo', price: 4200, rating: 1.5, x: 44, y: 73, popupImage: 'images/popups/item_17.png' },
+    { id: 18, map: 'hakgyo', price: 10500, rating: 4.5, x: 38, y: 27, popupImage: 'images/popups/item_18.png' },
+    { id: 19, map: 'hakgyo', price: 3300, rating: 2.5, x: 38, y: 22, popupImage: 'images/popups/item_19.png' },
+    { id: 20, map: 'hakgyo', price: 10000, rating: 3.8, x: 36, y: 29, popupImage: 'images/popups/item_20.png' },
+    { id: 21, map: 'hakgyo', price: 18500, rating: 4.5, x: 22, y: 38, popupImage: 'images/popups/item_21.png' },
+    { id: 22, map: 'hakgyo', price: 1800, rating: 4.8, x: 43, y: 27, popupImage: 'images/popups/item_22.png' },
+    { id: 23, map: 'hakgyo', price: 7500, rating: 2.7, x: 40, y: 81, popupImage: 'images/popups/item_23.png' },
+    { id: 24, map: 'hakgyo', price: 19000, rating: 3.8, x: 36, y: 25, popupImage: 'images/popups/item_24.png' }
 
-    // 페이지 로드 시 오늘 날짜로 기본 설정
-    dateInput.value = new Date().toISOString().split('T')[0];
 
-    // 데이터 로드 및 화면 업데이트
-    const loadRecords = async () => {
-        try {
-            const response = await fetch(WEB_APP_URL, { method: 'GET', redirect: 'follow' });
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            recordsCache = await response.json();
+];
 
-            // 서버에서 받은 데이터가 배열인지 확인합니다. 배열이 아니면 Apps Script 에러일 가능성이 높습니다.
-            if (!Array.isArray(recordsCache)) {
-                console.error("Error data received from Google Apps Script:", recordsCache);
-                throw new Error('Google Apps Script에서 에러가 발생했습니다. 개발자 도구(F12)의 Console 탭에서 상세 정보를 확인하세요.');
-            }
-            
-            recordsContainer.innerHTML = '<p>데이터를 불러오는 중...</p>';
-            // 최신순으로 정렬
-            // Timestamp 기준으로 정렬 (더 정확함)
-            recordsCache.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
-            
-            recordsContainer.innerHTML = ''; // 로딩 메시지 제거
-            recordsCache.forEach(addRecordToDOM);
-            renderMoodChart();
+// (2) 현재 선택된 상태를 저장할 변수
+let currentMap = 'dongne'; // 현재 보고있는 지도
+let currentFilter = 0;   // 현재 필터 (0 = all)
 
-        } catch (error) {
-            console.error('Error loading records:', error);
-            recordsContainer.innerHTML = `<p style="color: red;">데이터를 불러오는 데 실패했습니다. README.md 파일을 확인하여 설정을 완료했는지 확인하세요.</p>`;
+// (3) 필요한 HTML 요소들을 미리 찾아두기
+const mapContainer = document.getElementById('map-container');
+const mapImage = document.getElementById('map-image');
+const popup = document.getElementById('popup-modal');
+const popupCloseBtn = document.getElementById('popup-close');
+const popupImageEl = document.getElementById('popup-image');
+
+// --- [핵심 기능 1: 지도에 가격 버튼 그리기] ---
+function renderPriceTags() {
+    // 1. 기존에 있던 태그들 모두 삭제
+    const oldTags = document.querySelectorAll('.price-tag');
+    oldTags.forEach(tag => tag.remove());
+
+    // 2. allData에서 현재 지도(currentMap)에 맞는 데이터만 필터링
+    const mapData = allData.filter(item => item.map === currentMap);
+
+    // 3. 필터링된 데이터에서 현재 별점(currentFilter)에 맞는 데이터만 필터링
+    const filteredData = mapData.filter(item => {
+        if (currentFilter === 0) {
+            return true; // 'all' 버튼
         }
-    };
-
-    // DOM에 기록 목록 행 추가
-    const addRecordToDOM = (record) => {
-        const row = document.createElement('div');
-        row.classList.add('record-row');
-
-        const moodEmojis = { '굉장함': '😄', '적당함': '😀', '잔잔함': '😊', '소소함': '☺️' };
-        const typeText = { 'deed': '행복했어요!', 'help': '조금 아쉬웠어요..!' };
-
-        row.innerHTML = `
-            <div class="record-type ${record.Type}">${typeText[record.Type] || record.Type}</div>
-            <div class="record-content" title="${record.Content}">${record.Content}</div>
-            <div class="record-title" title="${record.title}">${record.title || '-'}</div>
-            <div class="record-date">${new Date(record.Date).toLocaleDateString()}</div>
-            <div class="record-mood">${moodEmojis[record.Mood] || ''}</div>
-        `;
-        recordsContainer.appendChild(row);
-    };
-
-    // 기분 통계 차트 렌더링
-    const renderMoodChart = () => {
-        const moodCounts = recordsCache.reduce((acc, record) => {
-            acc[record.Mood] = (acc[record.Mood] || 0) + 1;
-            return acc;
-        }, {});
-
-        const chartData = {
-            labels: Object.keys(moodCounts),
-            datasets: [{
-                label: '기분별 횟수',
-                data: Object.values(moodCounts),
-                backgroundColor: ['#FFC107', '#FF7043', '#8BC34A', '#2196F3', '#9C27B0'],
-                hoverOffset: 4
-            }]
-        };
-
-        if (moodChart) {
-            moodChart.destroy(); // 기존 차트 파괴
+        
+        // '4.0~' 버튼은 4.0 이상 모두 표시
+        if (currentFilter === 4) {
+            return item.rating >= 4.0;
         }
 
-        moodChart = new Chart(moodChartCanvas, {
-            type: 'pie',
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: '전체 기분 통계'
-                    }
-                }
-            }
+        // 1.0~, 2.0~, 3.0~ 버튼은 해당 범위만 표시
+        // 예: currentFilter가 2면 (2.0 <= rating < 3.0)
+        return item.rating >= currentFilter && item.rating < (currentFilter + 1);
+    });
+
+    // 4. 최종 필터링된 데이터를 가지고 HTML 요소(가격 버튼) 생성
+    filteredData.forEach(item => {
+        const tag = document.createElement('div');
+        tag.className = 'price-tag';
+        tag.innerText = `₩${item.price.toLocaleString()}`; // 1500 -> ₩1,500
+        tag.style.left = `${item.x}%`;
+        tag.style.top = `${item.y}%`;
+
+        // 5. 생성된 태그에 클릭 이벤트 추가
+        tag.addEventListener('click', () => {
+            showPopup(item.popupImage); // 이미지 경로 전달
         });
-    };
 
-    // 폼 제출 이벤트 처리
-    recordForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitButton = e.target.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = '저장 중...';
-
-        const formData = new FormData(recordForm);
-        const data = {
-            type: formData.get('type'),
-            date: formData.get('date'),
-            content: formData.get('content'),
-            mood: formData.get('mood'),
-            title: formData.get('https://script.google.com/macros/s/AKfycbzjscbyQFNYxSsWrSk_jLm37y04s8iYmCLCcJVrQVvOUqOpYAmF7Yzv2dM5PzKT-RTP/exec')
-        };
-
-        try {
-            const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Apps Script는 no-cors 모드 또는 복잡한 CORS 설정이 필요할 수 있습니다.
-                cache: 'no-cache',
-                redirect: 'follow',
-                body: JSON.stringify(data)
-            });
-
-            // no-cors 모드에서는 응답을 직접 읽을 수 없으므로, 성공적으로 전송되었다고 가정합니다.
-            alert('성공적으로 기록되었습니다!');
-            recordForm.reset();
-            dateInput.value = new Date().toISOString().split('T')[0];
-            loadRecords(); // 데이터 다시 불러오기
-
-        } catch (error) {
-            console.error('Error submitting record:', error);
-            alert('기록 저장에 실패했습니다. 인터넷 연결을 확인하세요.');
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = '기록하기';
-        }
+        // 6. 지도 컨테이너에 태그 추가
+        mapContainer.appendChild(tag);
     });
+}
 
-    // 엑셀 내보내기 이벤트 처리
-    exportButton.addEventListener('click', () => {
-        if (recordsCache.length === 0) {
-            alert('내보낼 데이터가 없습니다.');
-            return;
-        }
+// --- [핵심 기능 2: 팝업창 보여주기] ---
+function showPopup(imagePath) {
+    // 1. 팝업 이미지 요소의 src를 전달받은 경로로 변경
+    popupImageEl.src = imagePath;
 
-        // 데이터 시트 생성
-        const worksheet = XLSX.utils.json_to_sheet(recordsCache);
-        // 새 워크북 생성
-        const workbook = XLSX.utils.book_new();
-        // 워크북에 데이터 시트 추가
-        XLSX.utils.book_append_sheet(workbook, worksheet, "우리의 기록");
+    // 2. 팝업창 보여주기 (숨김 클래스 제거)
+    popup.classList.remove('hidden');
+}
 
-        // 헤더 스타일링 (선택 사항)
-        const headers = Object.keys(recordsCache[0]);
-        const header_styles = { font: { bold: true } };
-        for(let i = 0; i < headers.length; i++){
-            const cell_ref = XLSX.utils.encode_cell({c:i, r:0});
-            if(worksheet[cell_ref]) {
-                worksheet[cell_ref].s = header_styles;
-            }
-        }
-
-        // 엑셀 파일 내보내기
-        XLSX.writeFile(workbook, "our_kindness_records.xlsx");
-    });
-
-    // 초기 데이터 로드
-    loadRecords();
+// --- [핵심 기능 3: 팝업창 닫기] ---
+popupCloseBtn.addEventListener('click', () => {
+    popup.classList.add('hidden');
 });
+
+// --- [핵심 기능 4: 지도 변경 버튼] ---
+document.getElementById('btn-dongne').addEventListener('click', () => {
+    currentMap = 'dongne';
+    mapImage.src = 'images/dongne_map.png'; // 지도 이미지 변경
+    
+    // 버튼 활성화 스타일
+    document.getElementById('btn-dongne').classList.add('active');
+    document.getElementById('btn-hakgyo').classList.remove('active');
+    
+    renderPriceTags(); // 가격 버튼 다시 그리기
+});
+
+document.getElementById('btn-hakgyo').addEventListener('click', () => {
+    currentMap = 'hakgyo';
+    mapImage.src = 'images/hakgyo_map.png'; // 지도 이미지 변경
+    
+    // 버튼 활성화 스타일
+    document.getElementById('btn-dongne').classList.remove('active');
+    document.getElementById('btn-hakgyo').classList.add('active');
+    
+    renderPriceTags(); // 가격 버튼 다시 그리기
+});
+
+
+// --- [핵심 기능 5: 별점 필터 버튼] ---
+const filterButtons = document.querySelectorAll('.filter-btn');
+
+filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        // 1. data-filter="1" 처럼 HTML에 심어둔 값을 가져옴
+        currentFilter = parseFloat(button.dataset.filter);
+        
+        // (추가) 클릭한 버튼에만 'active' 스타일 적용
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // 2. 가격 버튼 다시 그리기
+        renderPriceTags(); 
+    });
+});
+
+
+// --- [최초 실행] ---
+// 페이지가 처음 로드되었을 때, 기본 지도를 한 번 그려줍니다.
+// (맨 처음에 'all' 버튼이 눌린 것처럼 보이게 스타일 추가)
+document.querySelector('.filter-btn[data-filter="0"]').classList.add('active');
+renderPriceTags();

@@ -1,0 +1,151 @@
+/* 기본 설정 */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background-color: #f0f0f0; 
+    
+    height: 100%;       /* [수정] body/html 높이 100% */
+    overflow: hidden;   /* [수정] 모든 스크롤바 숨기기 */
+}
+
+/* body, html 기본 설정 밑에 추가 */
+body {
+    display: flex;
+    align-items: center; /* [핵심] 지도를 세로 중앙 정렬 */
+}
+
+/* 1. 지도 영역 */
+#map-container {
+    position: relative; /* [유지] */
+    
+    /* [수정] 원본 너비 1920px (또는 1300 이미지의 실제 너비) */
+    min-width: 1920px; 
+    
+    width: 79%;       /* [유지] 좌우를 꽉 채움 */
+    
+    /* [추가] body(flex)가 지도를 강제로 줄이지 못하게 함 */
+    flex-shrink: 0; 
+    
+    /* [삭제] height, margin 등은 모두 제거 */
+}
+
+#map-image {
+    width: 79%;    /* [유지] 부모 너비(100%)를 따름 */
+    display: block;
+    
+    /* [삭제] height: 100% 등은 모두 제거 */
+}
+
+/* 2. 가격 버튼 (JavaScript가 생성할) */
+.price-tag {
+    position: absolute; /* 부모(#map-container) 기준 절대 위치 */
+    background-color: black;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px; /* 타원형 모양 */
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    /* top, left 값은 JS가 설정할 예정 */
+}
+
+.price-tag:hover {
+    transform: scale(1.1); /* 마우스 올리면 살짝 커지게 */
+}
+
+/* 3. 우측 하단 UI 패널 */
+#ui-panel {
+    position: fixed; /* (중요) 화면에 고정 */
+    bottom: 20px;
+    right: 20px;
+    background-color: black; /* (중요) 검은색 배경 */
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 100; /* 다른 요소보다 위에 표시 */
+    width: 150px; /* (추가) 패널의 너비를 고정합니다 (예시) */
+}
+
+.map-switch {
+    display: flex; /* '동네', '학교' 버튼을 가로로 정렬 */
+    margin-bottom: 10px; /* (중요) 필터 버튼과 구분되는 간격 */
+}
+.map-switch button {
+    background-color: #555; /* 비활성 버튼 색 */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    flex-grow: 1; /* 버튼이 1:1 비율로 꽉 차게 */
+}
+/* (중요) 활성화된 버튼 스타일 */
+.map-switch button.active {
+    background-color: white; 
+    color: black;
+}
+
+.filter-buttons {
+    display: grid; /* (중요) 버튼들을 세로로 정렬 */
+    gap: 5px; /* 버튼 사이 간격 */
+}
+.filter-buttons button {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 15px; /* 버튼 둥글게 */
+    padding: 5px 10px;
+    text-align: left;
+    cursor: pointer;
+}
+/* (중요) 활성화된 필터 버튼 스타일 */
+.filter-buttons button.active {
+    background-color: #f0f0f0;
+    color: black;
+    font-weight: bold;
+}
+
+/* 4. 팝업창 */ 
+/* (↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑) 여기까지가 3번 섹션입니다. */
+
+/* 4. 팝업창 */
+#popup-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 화면 정중앙 배치 */
+    
+    background-color: white; /* 이미지가 투명할 경우 대비 */
+    
+    /* (수정) 이미지 크기에 맞춰질 것이므로 
+       width, padding, border 등은 이미지 자체에 포함된 디자인에 맞게 조절 */
+    width: 350px; /* 예시: 팝업 이미지의 가로 크기 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 1001;
+}
+
+/* (추가) 팝업창 안의 이미지 */
+#popup-image {
+    width: 100%; /* 팝업창 너비에 꽉 차게 */
+    display: block; /* 이미지 아래 작은 여백 제거 */
+}
+
+/* (수정) 닫기 버튼 스타일 */
+#popup-close {
+    position: absolute; /* 팝업창 기준 */
+    top: 5px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #555;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1002; /* 이미지보다 위에 */
+}
+
+/* 5. 숨기기용 클래스 (동일) */
+.hidden {
+    display: none;
+}
